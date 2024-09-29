@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList';
 import styles from './App.module.scss';
 
@@ -7,12 +7,18 @@ interface Task {
     title: string;
     description: string;
     completed: boolean;
+    date: string;
 }
 
 const App: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+
+    const getCurrentDate = (): string => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
 
     const addTask = () => {
         if (title.trim()) {
@@ -21,6 +27,7 @@ const App: React.FC = () => {
                 title,
                 description,
                 completed: false,
+                date: getCurrentDate(),
             };
             setTasks([...tasks, newTask]);
             setTitle('');
@@ -39,6 +46,22 @@ const App: React.FC = () => {
     const deleteTask = (taskId: number) => {
         setTasks(tasks.filter((task) => task.id !== taskId));
     };
+
+    const carryOverIncompleteTasks = () => {
+        const today = getCurrentDate();
+        setTasks((prevTasks) =>
+            prevTasks.map((task) => {
+                if (!task.completed && task.date !== today) {
+                    return { ...task, date: today };
+                }
+                return task;
+            })
+        );
+    };
+
+    useEffect(() => {
+        carryOverIncompleteTasks();
+    }, []);
 
     return (
         <div className={styles.app}>

@@ -1,14 +1,13 @@
 .task {
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
-  transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для цвета и фона */
 
   &.completed {
     h3 {
       text-decoration: line-through;
     }
-    background-color: #e0ffe0; /* Задний фон для выполненной задачи */
-    color: #555; /* Цвет текста для выполненной задачи */
+    background-color: #e0ffe0;
+    color: #555;
   }
 
   .actions {
@@ -37,5 +36,11 @@
         }
       }
     }
+  }
+
+  .date {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
   }
 }

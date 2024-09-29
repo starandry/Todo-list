@@ -8,6 +8,7 @@ interface TaskListProps {
         title: string;
         description: string;
         completed: boolean;
+        date: string;
     }[];
     onToggle: (id: number) => void;
     onDelete: (id: number) => void;
@@ -27,6 +28,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
                     title={task.title}
                     description={task.description}
                     completed={task.completed}
+                    date={task.date}
                     onToggle={onToggle}
                     onDelete={onDelete}
                 />
