@@ -7,16 +7,18 @@ interface TaskProps {
     description: string;
     completed: boolean;
     date: string;
+    daysSpent: number;
     onToggle: (id: number) => void;
     onDelete: (id: number) => void;
 }
 
-const Task: React.FC<TaskProps> = ({ id, title, description, completed, date, onToggle, onDelete }) => {
+const Task: React.FC<TaskProps> = ({ id, title, description, completed, date, daysSpent, onToggle, onDelete }) => {
     return (
         <div className={`${styles.task} ${completed ? styles.completed : ''}`}>
             <h3>{title}</h3>
             <p>{description}</p>
             <p className={styles.date}>Created on: {date}</p>
+            <p className={styles.daysSpent}>Days spent on this task: {daysSpent}</p>
             <div className={styles.actions}>
                 <button onClick={() => onToggle(id)}>
                     {completed ? 'Undo' : 'Complete'}

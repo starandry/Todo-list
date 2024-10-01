@@ -9,6 +9,7 @@ interface TaskListProps {
         description: string;
         completed: boolean;
         date: string;
+        daysSpent: number;
     }[];
     onToggle: (id: number) => void;
     onDelete: (id: number) => void;
@@ -29,6 +30,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
                     description={task.description}
                     completed={task.completed}
                     date={task.date}
+                    daysSpent={task.daysSpent}
                     onToggle={onToggle}
                     onDelete={onDelete}
                 />

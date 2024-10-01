@@ -9,12 +9,12 @@
 
 .task-form {
   display: flex;
-  flex-direction: column; /* Поля и кнопка будут расположены друг под другом */
-  align-items: center;    /* Центрируем элементы по горизонтали */
+  flex-direction: column;
+  align-items: center;
 
   input,
   textarea {
-    width: 95%; /* Одинаковая ширина для инпута и текстового поля */
+    width: 95%;
     padding: 10px 15px;
     margin-bottom: 10px;
     border: 1px solid #ddd;
@@ -22,21 +22,27 @@
   }
 
   textarea {
-    resize: vertical; /* Разрешаем изменение только по высоте */
+    resize: vertical;
   }
 
   button {
-    width: 100%; /* Делаем кнопку такой же ширины, как инпуты */
+    width: 100%;
     padding: 10px 15px;
     background-color: #28a745;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    text-align: center;
 
     &:hover {
       background-color: #218838;
     }
+  }
+}
+
+.date-picker {
+  margin-bottom: 20px;
+  label {
+    margin-right: 10px;
   }
 }
