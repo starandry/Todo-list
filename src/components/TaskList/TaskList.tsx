@@ -4,15 +4,15 @@ import styles from './TaskList.module.scss';
 
 interface TaskListProps {
     tasks: {
-        id: number;
+        id: string;
         title: string;
         description: string;
         completed: boolean;
         date: string;
         daysSpent: number;
     }[];
-    onToggle: (id: number) => void;
-    onDelete: (id: number) => void;
+    onToggle: (id: string, completed: boolean) => void; // Добавляем completed как параметр
+    onDelete: (id: string) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
@@ -31,8 +31,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
                     completed={task.completed}
                     date={task.date}
                     daysSpent={task.daysSpent}
-                    onToggle={onToggle}
-                    onDelete={onDelete}
+                    onToggle={() => onToggle(task.id, task.completed)} // Передаем значение completed
+                    onDelete={() => onDelete(task.id)}
                 />
             ))}
         </ul>

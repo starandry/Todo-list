@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList';
-import DatePicker, { registerLocale } from 'react-datepicker';
-import { ru } from "date-fns/locale/ru";
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format, differenceInCalendarDays } from 'date-fns';
+import { format, differenceInCalendarDays, isBefore, isSameDay } from 'date-fns';
+import { auth, db } from '../firebaseConfig';
+import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore'; // Импортируем updateDoc для обновления задач
+import { User } from 'firebase/auth';
+import Auth from './components/Auth';
 import styles from './App.module.scss';
 
 interface Task {
-    id: number;
+    id: string;
     title: string;
     description: string;
     completed: boolean;
@@ -16,93 +19,139 @@ interface Task {
     frozenDays?: number;
 }
 
-registerLocale('ru', ru);
-
 const App: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [error, setError] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
-    const formatDate = (date: Date | null): string => {
-        return date ? format(date, 'yyyy-MM-dd') : '';
-    };
+    useEffect(() => {
+        if (user) {
+            const q = query(collection(db, 'tasks'), where('userId', '==', user.uid));
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const fetchedTasks: Task[] = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...(doc.data() as Omit<Task, 'id'>),
+                }));
+                setTasks(fetchedTasks);
+            });
 
-    const calculateDaysSpent = (taskDate: Date): number => {
-        const today = new Date();
-        return differenceInCalendarDays(today, taskDate);
-    };
+            return () => unsubscribe();
+        }
+    }, [user]);
 
-    const addTask = () => {
+    const handleAddTask = async () => {
+        // Валидация полей
+        if (!title.trim()) {
+            setError('Task title is required.');
+            return;
+        }
+
+        if (!description.trim()) {
+            setError('Task description is required.');
+            return;
+        }
+
         if (!selectedDate) {
             setError('Please select a date for the task.');
             return;
         }
-        
-        const taskDate = selectedDate;
 
-        const daysSpent = calculateDaysSpent(taskDate);
+        if (!user) {
+            setError('User is not authenticated.');
+            return;
+        }
 
-        if (title.trim()) {
-            const newTask: Task = {
-                id: tasks.length + 1,
+        const daysSpent = differenceInCalendarDays(new Date(), selectedDate);
+
+        try {
+            await addDoc(collection(db, 'tasks'), {
                 title,
                 description,
                 completed: false,
-                date: formatDate(taskDate),
-                daysSpent: daysSpent >= 0 ? daysSpent : 0,
-            };
-            setTasks([...tasks, newTask]);
+                date: format(selectedDate, 'yyyy-MM-dd'),
+                daysSpent: daysSpent < 0 ? 0 : daysSpent,
+                userId: user.uid,
+            });
             setTitle('');
             setDescription('');
             setError(null);
+        } catch (err) {
+            setError((err as Error).message);
         }
     };
 
-    const toggleTaskCompletion = (taskId: number) => {
-        setTasks((prevTasks) =>
-            prevTasks.map((task) => {
-                if (task.id === taskId) {
-                    if (task.completed) {
-                        return { ...task, completed: false, frozenDays: undefined };
-                    } else {
-                        return { ...task, completed: true, frozenDays: task.daysSpent };
-                    }
-                }
+    const handleToggleTaskCompletion = async (id: string, completed: boolean) => {
+        try {
+            const taskDocRef = doc(db, 'tasks', id);
 
-                if (!task.completed) {
-                    const taskDate = new Date(task.date);
-                    const updatedDaysSpent = calculateDaysSpent(taskDate);
-                    return { ...task, daysSpent: updatedDaysSpent };
-                }
+            // Обновляем статус задачи в Firestore
+            await updateDoc(taskDocRef, {
+                completed: !completed,
+            });
 
-                return task;
-            })
-        );
+            // Получаем обновленный статус задачи из Firestore
+            const updatedTaskSnapshot = await getDoc(taskDocRef);
+            const updatedTaskData = updatedTaskSnapshot.data();
+
+            // Обновляем локальное состояние задач с новыми данными
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task.id === id ? { ...task, completed: updatedTaskData?.completed } : task
+                )
+            );
+
+        } catch (err) {
+            console.error('Error updating task: ', err);
+        }
     };
 
-    const deleteTask = (taskId: number) => {
-        setTasks(tasks.filter((task) => task.id !== taskId));
+    const handleDeleteTask = async (id: string) => {
+        try {
+            await deleteDoc(doc(db, 'tasks', id));
+            setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+        } catch (err) {
+            console.error('Error deleting task: ', err);
+        }
     };
 
-    const filteredTasks = selectedDate
-        ? tasks.filter((task) => task.date === formatDate(selectedDate))
-        : [];
+    const calculateDaysSpent = (taskDate: string) => {
+        const taskDateParsed = new Date(taskDate);
+        const today = new Date();
+
+        if (isBefore(today, taskDateParsed) && !isSameDay(today, taskDateParsed)) {
+            return 0;
+        }
+
+        return differenceInCalendarDays(today, taskDateParsed);
+    };
+
+    // Фильтруем задачи по выбранной дате
+    const filteredTasks = tasks.filter((task) => {
+        return selectedDate && task.date === format(selectedDate, 'yyyy-MM-dd');
+    });
+
+    if (!user) {
+        return <Auth onLogin={setUser} />;
+    }
 
     return (
         <div className={styles.app}>
             <h1>Task Tracker</h1>
+            <button className={styles['logout-btn']} onClick={() => auth.signOut().then(() => setUser(null))}>
+                Logout
+            </button>
 
             <div className={styles['date-picker']}>
                 <label>Select Date: </label>
                 <DatePicker
                     selected={selectedDate}
                     onChange={(date) => setSelectedDate(date)}
-                    dateFormat="dd-MM-yyyy"
+                    dateFormat="yyyy-MM-dd"
                     isClearable
-                    placeholderText="Выберите дату"
-                    locale="ru"
+                    placeholderText="Select a date"
                 />
             </div>
 
@@ -120,22 +169,18 @@ const App: React.FC = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
-                <button onClick={addTask}>Add Task</button>
+                <button onClick={handleAddTask}>Add Task</button>
             </div>
 
             {selectedDate ? (
-                filteredTasks.length > 0 ? (
-                    <TaskList
-                        tasks={filteredTasks.map(task => ({
-                            ...task,
-                            daysSpent: task.completed ? task.frozenDays || task.daysSpent : task.daysSpent
-                        }))}
-                        onToggle={toggleTaskCompletion}
-                        onDelete={deleteTask}
-                    />
-                ) : (
-                    <p>No tasks for this date!</p>
-                )
+                <TaskList
+                    tasks={filteredTasks.map(task => ({
+                        ...task,
+                        daysSpent: calculateDaysSpent(task.date)
+                    }))}
+                    onToggle={(id, completed) => handleToggleTaskCompletion(id, completed)}
+                    onDelete={handleDeleteTask}
+                />
             ) : null}
         </div>
     );

@@ -46,3 +46,23 @@
     margin-right: 10px;
   }
 }
+
+.logout-btn {
+  background-color: #6c757d;
+  color: white; // Белый текст
+  padding: 10px 20px; // Отступы внутри кнопки
+  border: none; // Убираем рамку
+  border-radius: 5px; // Закругляем углы
+  font-size: 1rem; // Размер шрифта
+  cursor: pointer; // Курсор при наведении
+  transition: background-color 0.3s ease; // Плавный переход при наведении
+  margin-bottom: 20px; // Отступ снизу
+
+  &:hover {
+    background-color: #5a6268; // Темнее при наведении
+  }
+
+  &:focus {
+    outline: none; // Убираем обводку при фокусе
+  }
+}
