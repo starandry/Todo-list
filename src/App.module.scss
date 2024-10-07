@@ -1,68 +1,68 @@
 .app {
-  max-width: 600px;
-  margin: 0 auto;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .task-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-  input,
-  textarea {
-    width: 95%;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-
-  textarea {
-    resize: vertical;
-  }
-
-  button {
-    width: 100%;
-    padding: 10px 15px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #218838;
+    input,
+    textarea {
+        width: 95%;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
     }
-  }
+
+    textarea {
+        resize: vertical;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px 15px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #218838;
+        }
+    }
 }
 
 .date-picker {
-  margin-bottom: 20px;
-  label {
-    margin-right: 10px;
-  }
+    margin-bottom: 20px;
+    label {
+        margin-right: 10px;
+    }
 }
 
 .logout-btn {
-  background-color: #6c757d;
-  color: white; // Белый текст
-  padding: 10px 20px; // Отступы внутри кнопки
-  border: none; // Убираем рамку
-  border-radius: 5px; // Закругляем углы
-  font-size: 1rem; // Размер шрифта
-  cursor: pointer; // Курсор при наведении
-  transition: background-color 0.3s ease; // Плавный переход при наведении
-  margin-bottom: 20px; // Отступ снизу
+    background-color: #6c757d;
+    color: white; // Белый текст
+    padding: 10px 20px; // Отступы внутри кнопки
+    border: none; // Убираем рамку
+    border-radius: 5px; // Закругляем углы
+    font-size: 1rem; // Размер шрифта
+    cursor: pointer; // Курсор при наведении
+    transition: background-color 0.3s ease; // Плавный переход при наведении
+    margin-bottom: 20px; // Отступ снизу
 
-  &:hover {
-    background-color: #5a6268; // Темнее при наведении
-  }
+    &:hover {
+        background-color: #5a6268; // Темнее при наведении
+    }
 
-  &:focus {
-    outline: none; // Убираем обводку при фокусе
-  }
+    &:focus {
+        outline: none; // Убираем обводку при фокусе
+    }
 }

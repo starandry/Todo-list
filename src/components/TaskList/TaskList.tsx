@@ -10,14 +10,15 @@ interface TaskListProps {
         completed: boolean;
         date: string;
         daysSpent: number;
+        completionDate?: string;
     }[];
-    onToggle: (id: string, completed: boolean) => void; // Добавляем completed как параметр
+    onToggle: (id: string, completed: boolean, taskDate: string) => void;
     onDelete: (id: string) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
     if (tasks.length === 0) {
-        return <p>No tasks for today!</p>;
+        return <p>No tasks for this day!</p>;
     }
 
     return (
@@ -31,8 +32,9 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
                     completed={task.completed}
                     date={task.date}
                     daysSpent={task.daysSpent}
-                    onToggle={() => onToggle(task.id, task.completed)} // Передаем значение completed
-                    onDelete={() => onDelete(task.id)}
+                    completionDate={task.completionDate}
+                    onToggle={onToggle}
+                    onDelete={onDelete}
                 />
             ))}
         </ul>

@@ -33,12 +33,7 @@ const Auth: React.FC<{ onLogin: (user: User) => void }> = ({ onLogin }) => {
             <div className={styles['auth-box']}>
                 <h2>{isLogin ? 'Login' : 'Register'}</h2>
                 <form onSubmit={handleSubmit}>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
+                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <input
                         type="password"
                         placeholder="Password"
