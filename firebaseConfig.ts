@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 
 // Firebase configuration from Firebase Console
 const firebaseConfig = {
@@ -10,11 +10,11 @@ const firebaseConfig = {
     storageBucket: 'todo-list-5a426.appspot.com',
     messagingSenderId: '654503622293',
     appId: '1:654503622293:web:bcaf1125bc2f97d899cd9c',
-};
+}
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig)
 
 // Initialize Firebase Authentication and Firestore
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const auth = getAuth(app)
+export const db = getFirestore(app)

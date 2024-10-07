@@ -1,24 +1,23 @@
-import React from 'react';
-import Task from '../Task';
-import styles from './TaskList.module.scss';
+import React from 'react'
+import Task from '../Task'
+import styles from './TaskList.module.scss'
 
 interface TaskListProps {
     tasks: {
-        id: string;
-        title: string;
-        description: string;
-        completed: boolean;
-        date: string;
-        daysSpent: number;
-        completionDate?: string;
-    }[];
-    onToggle: (id: string, completed: boolean, taskDate: string) => void;
-    onDelete: (id: string) => void;
+        id: string
+        title: string
+        description: string
+        completed: boolean
+        date: string
+        daysSpent: number
+    }[]
+    onToggle: (id: string, completed: boolean) => void // Добавляем completed как параметр
+    onDelete: (id: string) => void
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
     if (tasks.length === 0) {
-        return <p>No tasks for this day!</p>;
+        return <p>No tasks for today!</p>
     }
 
     return (
@@ -32,13 +31,12 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
                     completed={task.completed}
                     date={task.date}
                     daysSpent={task.daysSpent}
-                    completionDate={task.completionDate}
-                    onToggle={onToggle}
-                    onDelete={onDelete}
+                    onToggle={() => onToggle(task.id, task.completed)} // Передаем значение completed
+                    onDelete={() => onDelete(task.id)}
                 />
             ))}
         </ul>
-    );
-};
+    )
+}
 
-export default TaskList;
+export default TaskList

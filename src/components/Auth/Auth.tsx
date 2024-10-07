@@ -1,32 +1,34 @@
-import React, { useState } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from 'firebase/auth'; // Импортируем тип User
-import { auth } from '../../../firebaseConfig';
-import styles from './Auth.module.scss'; // Импортируем стили
+import React, { useState } from 'react'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from 'firebase/auth' // Импортируем тип User
+import { auth } from '../../../firebaseConfig'
+import styles from './Auth.module.scss' // Импортируем стили
 
-const Auth: React.FC<{ onLogin: (user: User) => void }> = ({ onLogin }) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLogin, setIsLogin] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+const Auth: React.FC<{
+    onLogin: (user: User) => void
+}> = ({ onLogin }) => {
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [isLogin, setIsLogin] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
+        e.preventDefault()
+        setError(null)
 
         try {
             if (isLogin) {
                 // Вход
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                onLogin(userCredential.user); // user возвращает тип User
+                const userCredential = await signInWithEmailAndPassword(auth, email, password)
+                onLogin(userCredential.user) // user возвращает тип User
             } else {
                 // Регистрация
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                onLogin(userCredential.user); // user возвращает тип User
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+                onLogin(userCredential.user) // user возвращает тип User
             }
         } catch (err) {
-            setError((err as Error).message);
+            setError((err as Error).message)
         }
-    };
+    }
 
     return (
         <div className={styles['auth-container']}>
@@ -48,7 +50,7 @@ const Auth: React.FC<{ onLogin: (user: User) => void }> = ({ onLogin }) => {
                 </button>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default Auth;
+export default Auth
