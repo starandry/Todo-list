@@ -94,7 +94,7 @@ const App: React.FC = () => {
                 description,
                 completed: false,
                 date: format(selectedDate, 'yyyy-MM-dd'), // Сохраняем оригинальную дату создания
-                displayDate: format(new Date(), 'yyyy-MM-dd'), // Дата отображения = текущий день
+                displayDate: format(selectedDate, 'yyyy-MM-dd'), // Для будущих дат displayDate = date
                 daysSpent: daysSpent < 0 ? 0 : daysSpent,
                 userId: user.uid,
             })
