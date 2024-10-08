@@ -17,7 +17,6 @@ interface Task {
     date: string // Оригинальная дата создания
     displayDate: string // Дата для отображения
     daysSpent: number
-    frozenDays?: number
 }
 
 const App: React.FC = () => {
@@ -44,11 +43,22 @@ const App: React.FC = () => {
                     fetchedTasks.map(async (task) => {
                         const taskDateParsed = new Date(task.date)
 
-                        // Если задача не выполнена и просрочена, обновляем только displayDate на текущий день
+                        // Обновляем displayDate только для незавершённых и просроченных задач
                         if (!task.completed && isBefore(taskDateParsed, new Date())) {
-                            await updateDoc(doc(db, 'tasks', task.id), { displayDate: today })
-                            return { ...task, displayDate: today }
+                            const calcDaysElapsed = differenceInCalendarDays(today, taskDateParsed)
+
+                            await updateDoc(doc(db, 'tasks', task.id), {
+                                displayDate: today,
+                                daysSpent: calcDaysElapsed,
+                            })
+                            return { ...task, displayDate: today, daysSpent: calcDaysElapsed }
                         }
+
+                        // Для завершённых задач displayDate оставляем как date
+                        if (task.completed) {
+                            return { ...task, displayDate: task.date }
+                        }
+
                         return task
                     })
                 )
