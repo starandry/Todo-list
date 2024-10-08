@@ -14,7 +14,8 @@ interface Task {
     title: string
     description: string
     completed: boolean
-    date: string
+    date: string // Оригинальная дата создания
+    displayDate: string // Дата для отображения
     daysSpent: number
     frozenDays?: number
 }
@@ -27,17 +28,32 @@ const App: React.FC = () => {
     const [error, setError] = useState<string | null>(null)
     const [user, setUser] = useState<User | null>(null)
 
-    /*подписка на любые изменения пользователя в бд
-     * установка задач юзера с firestore*/
+    const today = format(new Date(), 'yyyy-MM-dd')
+
+    /* Подписка на изменения пользователя в БД */
     useEffect(() => {
         if (user) {
             const q = query(collection(db, 'tasks'), where('userId', '==', user.uid))
-            const unsubscribe = onSnapshot(q, (snapshot) => {
+            const unsubscribe = onSnapshot(q, async (snapshot) => {
                 const fetchedTasks: Task[] = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...(doc.data() as Omit<Task, 'id'>),
                 }))
-                setTasks(fetchedTasks)
+
+                const updatedTasks = await Promise.all(
+                    fetchedTasks.map(async (task) => {
+                        const taskDateParsed = new Date(task.date)
+
+                        // Если задача не выполнена и просрочена, обновляем только displayDate на текущий день
+                        if (!task.completed && isBefore(taskDateParsed, new Date())) {
+                            await updateDoc(doc(db, 'tasks', task.id), { displayDate: today })
+                            return { ...task, displayDate: today }
+                        }
+                        return task
+                    })
+                )
+
+                setTasks(updatedTasks)
             })
 
             return () => unsubscribe()
@@ -45,7 +61,6 @@ const App: React.FC = () => {
     }, [user])
 
     const handleAddTask = async () => {
-        // Валидация полей
         if (!title.trim()) {
             setError('Task title is required.')
             return
@@ -61,10 +76,7 @@ const App: React.FC = () => {
             return
         }
 
-        const today = new Date()
-
-        // Проверяем, если выбранная дата раньше текущего дня (исключая текущий день)
-        if (differenceInCalendarDays(selectedDate, today) < 0) {
+        if (differenceInCalendarDays(selectedDate, new Date()) < 0) {
             setError('The date cannot be earlier than today. Please select a valid date.')
             return
         }
@@ -81,7 +93,8 @@ const App: React.FC = () => {
                 title,
                 description,
                 completed: false,
-                date: format(selectedDate, 'yyyy-MM-dd'),
+                date: format(selectedDate, 'yyyy-MM-dd'), // Сохраняем оригинальную дату создания
+                displayDate: format(new Date(), 'yyyy-MM-dd'), // Дата отображения = текущий день
                 daysSpent: daysSpent < 0 ? 0 : daysSpent,
                 userId: user.uid,
             })
@@ -133,18 +146,17 @@ const App: React.FC = () => {
 
     const calculateDaysSpent = (taskDate: string) => {
         const taskDateParsed = new Date(taskDate)
-        const today = new Date()
 
-        if (isBefore(today, taskDateParsed) && !isSameDay(today, taskDateParsed)) {
+        if (isBefore(new Date(), taskDateParsed) && !isSameDay(new Date(), taskDateParsed)) {
             return 0
         }
 
-        return differenceInCalendarDays(today, taskDateParsed)
+        return differenceInCalendarDays(new Date(), taskDateParsed)
     }
 
-    // Фильтруем задачи по выбранной дате
+    // Фильтруем задачи по выбранной дате с учетом displayDate
     const filteredTasks = tasks.filter((task) => {
-        return selectedDate && task.date === format(selectedDate, 'yyyy-MM-dd')
+        return selectedDate && task.displayDate === format(selectedDate, 'yyyy-MM-dd')
     })
 
     if (!user) {
@@ -169,15 +181,7 @@ const App: React.FC = () => {
                 />
             </div>
 
-            {error && (
-                <p
-                    style={{
-                        color: 'red',
-                    }}
-                >
-                    {error}
-                </p>
-            )}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <div className={styles['task-form']}>
                 <input type="text" placeholder="Task Title" value={title} onChange={(e) => setTitle(e.target.value)} />
