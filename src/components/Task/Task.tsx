@@ -8,7 +8,7 @@ interface TaskProps {
     completed: boolean
     date: string
     daysSpent: number
-    onToggle: (id: string, completed: boolean) => void // Добавляем completed как параметр
+    onToggle: (id: string, completed: boolean) => void
     onDelete: (id: string) => void
 }
 

@@ -19,11 +19,11 @@ const Auth: React.FC<{
             if (isLogin) {
                 // Вход
                 const userCredential = await signInWithEmailAndPassword(auth, email, password)
-                onLogin(userCredential.user) // user возвращает тип User
+                onLogin(userCredential.user)
             } else {
                 // Регистрация
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-                onLogin(userCredential.user) // user возвращает тип User
+                onLogin(userCredential.user)
             }
         } catch (err) {
             setError((err as Error).message)

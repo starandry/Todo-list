@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { format, differenceInCalendarDays, isBefore, isSameDay } from 'date-fns'
 import { auth, db } from '../firebaseConfig'
-import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore' // Импортируем updateDoc для обновления задач
+import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore'
 import { User } from 'firebase/auth'
 import Auth from './components/Auth'
 import styles from './App.module.scss'
@@ -27,6 +27,8 @@ const App: React.FC = () => {
     const [error, setError] = useState<string | null>(null)
     const [user, setUser] = useState<User | null>(null)
 
+    /*подписка на любые изменения пользователя в бд
+     * установка задач юзера с firestore*/
     useEffect(() => {
         if (user) {
             const q = query(collection(db, 'tasks'), where('userId', '==', user.uid))
@@ -56,6 +58,14 @@ const App: React.FC = () => {
 
         if (!selectedDate) {
             setError('Please select a date for the task.')
+            return
+        }
+
+        const today = new Date()
+
+        // Проверяем, если выбранная дата раньше текущего дня (исключая текущий день)
+        if (differenceInCalendarDays(selectedDate, today) < 0) {
+            setError('The date cannot be earlier than today. Please select a valid date.')
             return
         }
 
