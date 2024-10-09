@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { format, differenceInCalendarDays, isBefore, isSameDay } from 'date-fns'
 import { auth, db } from '../firebaseConfig'
-import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore'
+import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import { User } from 'firebase/auth'
 import Auth from './components/Auth'
 import styles from './App.module.scss'
@@ -17,6 +17,7 @@ interface Task {
     date: string // Оригинальная дата создания
     displayDate: string // Дата для отображения
     daysSpent: number
+    lastCompletionDate: string | null // Дата последнего завершения задачи
 }
 
 const App: React.FC = () => {
@@ -106,6 +107,7 @@ const App: React.FC = () => {
                 date: format(selectedDate, 'yyyy-MM-dd'), // Сохраняем оригинальную дату создания
                 displayDate: format(selectedDate, 'yyyy-MM-dd'), // Для будущих дат displayDate = date
                 daysSpent: daysSpent < 0 ? 0 : daysSpent,
+                lastCompletionDate: null, // Изначально задачи не завершались
                 userId: user.uid,
             })
             setTitle('')
@@ -116,30 +118,67 @@ const App: React.FC = () => {
         }
     }
 
-    const handleToggleTaskCompletion = async (id: string, completed: boolean) => {
+    const handleToggleTaskCompletion = async (
+        id: string,
+        completed: boolean,
+        taskDate: string,
+        currentDaysSpent: number,
+        lastCompletionDate: string | null
+    ) => {
         try {
             const taskDocRef = doc(db, 'tasks', id)
 
-            // Обновляем статус задачи в Firestore
-            await updateDoc(taskDocRef, {
-                completed: !completed,
-            })
+            // Если задача НЕ завершена и пользователь завершает её
+            if (!completed) {
+                const daysSpent = lastCompletionDate
+                    ? differenceInCalendarDays(new Date(), new Date(lastCompletionDate)) + currentDaysSpent // Считаем дни с последнего завершения
+                    : differenceInCalendarDays(new Date(), new Date(taskDate)) + currentDaysSpent // Если задача ни разу не завершалась
 
-            // Получаем обновленный статус задачи из Firestore
-            const updatedTaskSnapshot = await getDoc(taskDocRef)
-            const updatedTaskData = updatedTaskSnapshot.data()
+                // Обновляем статус задачи, замораживаем потраченные дни и записываем дату завершения
+                await updateDoc(taskDocRef, {
+                    completed: true,
+                    daysSpent, // Замораживаем потраченные дни
+                    lastCompletionDate: format(new Date(), 'yyyy-MM-dd'), // Сохраняем дату завершения
+                })
 
-            // Обновляем локальное состояние задач с новыми данными
-            setTasks((prevTasks) =>
-                prevTasks.map((task) =>
-                    task.id === id
-                        ? {
-                              ...task,
-                              completed: updatedTaskData?.completed,
-                          }
-                        : task
+                // Обновляем состояние с новыми данными
+                setTasks((prevTasks) =>
+                    prevTasks.map((task) =>
+                        task.id === id
+                            ? {
+                                  ...task,
+                                  completed: true,
+                                  daysSpent,
+                                  lastCompletionDate: format(new Date(), 'yyyy-MM-dd'), // Сохраняем дату завершения
+                              }
+                            : task
+                    )
                 )
-            )
+            } else {
+                // Если задача УЖЕ завершена, но пользователь снова открывает её для выполнения
+                const newTaskDate = lastCompletionDate || taskDate // Используем дату последнего завершения или создания задачи
+                const updatedDaysSpent = differenceInCalendarDays(new Date(), new Date(newTaskDate)) // Начинаем счёт с последней даты
+
+                await updateDoc(taskDocRef, {
+                    completed: false,
+                    daysSpent: updatedDaysSpent, // Считаем дни с последней завершённой даты
+                    lastCompletionDate: null, // Сбрасываем дату последнего завершения
+                })
+
+                // Обновляем локальное состояние задач
+                setTasks((prevTasks) =>
+                    prevTasks.map((task) =>
+                        task.id === id
+                            ? {
+                                  ...task,
+                                  completed: false,
+                                  daysSpent: updatedDaysSpent,
+                                  lastCompletionDate: null, // Очищаем дату последнего завершения
+                              }
+                            : task
+                    )
+                )
+            }
         } catch (err) {
             console.error('Error updating task: ', err)
         }
@@ -154,14 +193,14 @@ const App: React.FC = () => {
         }
     }
 
-    const calculateDaysSpent = (taskDate: string) => {
-        const taskDateParsed = new Date(taskDate)
+    const calculateDaysSpent = (taskDate: string, lastCompletionDate: string | null) => {
+        const referenceDate = lastCompletionDate ? new Date(lastCompletionDate) : new Date(taskDate)
 
-        if (isBefore(new Date(), taskDateParsed) && !isSameDay(new Date(), taskDateParsed)) {
+        if (isBefore(new Date(), referenceDate) && !isSameDay(new Date(), referenceDate)) {
             return 0
         }
 
-        return differenceInCalendarDays(new Date(), taskDateParsed)
+        return differenceInCalendarDays(new Date(), referenceDate)
     }
 
     // Фильтруем задачи по выбранной дате с учетом displayDate
@@ -207,9 +246,11 @@ const App: React.FC = () => {
                 <TaskList
                     tasks={filteredTasks.map((task) => ({
                         ...task,
-                        daysSpent: calculateDaysSpent(task.date),
+                        daysSpent: calculateDaysSpent(task.date, task.lastCompletionDate),
                     }))}
-                    onToggle={(id, completed) => handleToggleTaskCompletion(id, completed)}
+                    onToggle={(id, completed, date, daysSpent, lastCompletionDate) =>
+                        handleToggleTaskCompletion(id, completed, date, daysSpent, lastCompletionDate)
+                    }
                     onDelete={handleDeleteTask}
                 />
             ) : null}
