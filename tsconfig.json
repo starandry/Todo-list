@@ -7,5 +7,10 @@
         {
             "path": "./tsconfig.node.json"
         }
-    ]
+    ],
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "esModuleInterop": true
+    },
+    "include": ["src/**/*", "declarations.d.ts"]
 }

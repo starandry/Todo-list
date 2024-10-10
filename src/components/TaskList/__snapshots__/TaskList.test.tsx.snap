@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TaskList Component renders "No tasks for today!" when tasks array is empty 1`] = `
+<DocumentFragment>
+  <p>
+    No tasks for today!
+  </p>
+</DocumentFragment>
+`;
+
+exports[`TaskList Component renders tasks correctly when tasks array is not empty 1`] = `
+<DocumentFragment>
+  <ul
+    class="task-list"
+  >
+    <div
+      class="task "
+    >
+      <h3>
+        Test Task 1
+      </h3>
+      <p>
+        This is the first test task
+      </p>
+      <p
+        class="date"
+      >
+        Created on: 2024-10-10
+      </p>
+      <p
+        class="daysSpent"
+      >
+        Days spent on this task: 3
+      </p>
+       
+      <div
+        class="actions"
+      >
+        <button>
+          Complete
+        </button>
+        <button>
+          Delete
+        </button>
+      </div>
+    </div>
+    <div
+      class="task completed"
+    >
+      <h3>
+        Test Task 2
+      </h3>
+      <p>
+        This is the second test task
+      </p>
+      <p
+        class="date"
+      >
+        Created on: 2024-10-09
+      </p>
+      <p
+        class="daysSpent"
+      >
+        Days spent on this task: 5
+      </p>
+       
+      <div
+        class="actions"
+      >
+        <button>
+          Undo
+        </button>
+        <button>
+          Delete
+        </button>
+      </div>
+    </div>
+  </ul>
+</DocumentFragment>
+`;

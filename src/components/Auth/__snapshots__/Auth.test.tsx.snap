@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Auth Component renders correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="auth-container"
+  >
+    <div
+      class="auth-box"
+    >
+      <h2>
+        Login
+      </h2>
+      <form>
+        <input
+          placeholder="Email"
+          type="email"
+          value=""
+        />
+        <input
+          placeholder="Password"
+          type="password"
+          value=""
+        />
+        <button
+          type="submit"
+        >
+          Login
+        </button>
+      </form>
+      <button
+        class="switch-btn"
+      >
+        Switch to Register
+      </button>
+    </div>
+  </div>
+</DocumentFragment>
+`;
