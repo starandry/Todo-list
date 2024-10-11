@@ -185,10 +185,10 @@ const App: React.FC = () => {
                 <label>Select Date: </label>
                 <DatePicker
                     selected={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
+                    onChange={(date: Date | null) => setSelectedDate(date)}
                     dateFormat="yyyy-MM-dd"
                     isClearable
-                    placeholderText="Select a date"
+                    placeholderText="Выберите дату"
                     locale="ru"
                 />
             </div>
