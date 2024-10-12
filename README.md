@@ -1,54 +1,139 @@
-# React + TypeScript + Vite
+# Todo List Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Task
 
-Currently, two official plugins are available:
+Этот проект представляет собой трекер задач (Todo List), который позволяет пользователям создавать, отмечать выполнение задач и удалять их. Задачи создаются с указанием описания, даты, и приложение автоматически вычисляет количество дней, затраченных на выполнение задачи. Пользователи также могут "заморозить" задачу после её выполнения. Все задачи привязаны к конкретному пользователю, что позволяет сохранять и управлять ими через Firebase.
 
--   [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
--   [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Основные функции:
 
-## Expanding the ESLint configuration
+-   Аутентификация пользователей через Firebase.
+-   Добавление и удаление задач.
+-   Автоматическое обновление количества дней, затраченных на выполнение задач.
+-   Возможность заморозки завершённых задач.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## How to run the app
 
--   Configure the top-level `parserOptions` property like this:
+### Установка зависимостей
 
-```js
-export default tseslint.config({
-    languageOptions: {
-        // other options...
-        parserOptions: {
-            project: ['./tsconfig.node.json', './tsconfig.app.json'],
-            tsconfigRootDir: import.meta.dirname,
-        },
-    },
-})
-```
+Перед запуском убедитесь, что у вас установлены Node.js и npm. После этого выполните следующие шаги:
 
--   Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
--   Optionally add `...tseslint.configs.stylisticTypeChecked`
--   Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+1. Клонируйте репозиторий:
+    ```bash
+    git clone https://github.com/starandry/Todo-list.git
+    ```
+2. Перейдите в папку проекта:
+    ```bash
+    cd todo-list
+    ```
+3. Установите все необходимые зависимости:
+    ```bash
+    npm install
+    ```
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Запуск в режиме разработки
 
-export default tseslint.config({
-    // Set the react version
-    settings: {
-        react: {
-            version: '18.3',
-        },
-    },
-    plugins: {
-        // Add the react plugin
-        react,
-    },
-    rules: {
-        // other rules...
-        // Enable its recommended rules
-        ...react.configs.recommended.rules,
-        ...react.configs['jsx-runtime'].rules,
-    },
-})
-```
+Для запуска приложения в режиме разработки используйте следующую команду:
+
+````bash
+npm run dev
+
+### Линтинг кода
+
+Для запуска статического анализа кода на предмет ошибок и несоответствий используйте следующую команду:
+
+```bash
+npm run lint
+
+### Форматирование кода
+
+Для автоматического форматирования кода с использованием Prettier запустите:
+
+```bash
+npm run format
+
+
+###Автоисправление ошибок
+
+Для автоматического исправления ошибок линтинга и форматирования используйте:
+
+```bash
+npm run fix
+
+###Предпросмотр собранного приложения
+
+Для предпросмотра уже собранной версии приложения выполните:
+
+```bash
+npm run preview
+
+###Настройка Git хуков
+
+Для настройки Git хуков с помощью Husky выполните:
+
+```bash
+npm run prepare
+
+###Запуск тестов
+
+Для запуска всех тестов в режиме наблюдения выполните:
+
+```bash
+npm run test
+
+
+
+Dependencies
+Основные зависимости, используемые в проекте:
+
+React — библиотека для создания пользовательского интерфейса.
+Firebase — для аутентификации и хранения данных.
+date-fns — библиотека для работы с датами.
+Sass — препроцессор для стилей.
+Vite — инструмент для сборки проекта.
+
+
+Корневая папка Todo-list
+.husky/ — содержит конфигурации и хуки для Husky, которые автоматически выполняются перед коммитами (например, для проверки кода или запуска тестов).
+node_modules/ — стандартная папка, содержащая все установленные npm-зависимости проекта. Этот каталог автоматически создаётся при установке пакетов с помощью команды npm install.
+src/ — основная папка проекта, содержащая исходные файлы приложения.
+.gitignore — файл, который указывает Git, какие файлы или папки не нужно отслеживать (например, node_modules или файлы сборки).
+.prettierrc — конфигурационный файл для Prettier, который управляет правилами форматирования кода.
+eslint.config.js — конфигурационный файл для ESLint, инструмента для проверки стиля кода.
+firebaseConfig.ts — файл с конфигурацией Firebase, используемой в проекте для аутентификации и работы с базой данных.
+index.html — главный HTML файл, который используется для рендеринга приложения.
+jest.config.ts — файл конфигурации для тестового фреймворка Jest.
+jest.setup.ts — файл с настройками для тестов с Jest (например, импорт библиотек или глобальных переменных).
+package.json — файл с информацией о проекте и его зависимостях. Также содержит скрипты для запуска задач (сборка, тесты, линтинг и т.д.).
+package-lock.json — файл, фиксирующий точные версии установленных npm-зависимостей.
+README.md — файл с информацией и инструкциями по использованию проекта.
+tsconfig.*.json — файлы конфигурации TypeScript, которые управляют настройками компиляции для различных частей проекта (app, node).
+vite.config.ts — конфигурационный файл для Vite, сборщика проекта.
+
+
+Папка src/
+Это основная папка проекта, где находится код приложения.
+1. components/ — папка, содержащая React-компоненты.
+Auth/ — компоненты для аутентификации:
+Auth.tsx — компонент, отвечающий за аутентификацию пользователей.
+Auth.test.tsx — тесты для компонента аутентификации.
+Auth.module.scss — стили для компонента аутентификации.
+snapshots/ — папка с автоматическими снимками (snapshots) для тестов, созданными Jest.
+Task/ — компоненты, связанные с задачами:
+Task.tsx — основной компонент задачи.
+Task.test.tsx — тесты для компонента задачи.
+Task.module.scss — стили для компонента задачи.
+snapshots/ — папка с тестовыми снимками.
+TaskList/ — компоненты для списка задач:
+TaskList.tsx — компонент, отображающий список задач.
+TaskList.test.tsx — тесты для компонента списка задач.
+TaskList.module.scss — стили для компонента списка задач.
+2. App.tsx — основной компонент приложения, который отвечает за его общую логику.
+App.module.scss — стили для компонента App.
+App.test.tsx — тесты для основного компонента приложения.
+3. helpers.ts — файл, содержащий вспомогательные функции для работы приложения.
+4. declarations.d.ts — файл деклараций типов TypeScript для использования в проекте.
+5. index.scss — основной файл стилей для всего приложения.
+6. main.tsx — главный файл для инициализации и рендеринга React-приложения.
+7. taskHelpers.ts — файл с вспомогательными функциями, связанными с задачами.
+8. vite-env.d.ts — декларации типов, специфичные для работы с Vite.
+````

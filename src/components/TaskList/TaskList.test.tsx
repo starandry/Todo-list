@@ -7,14 +7,11 @@ describe('TaskList Component', () => {
         const mockOnToggle = jest.fn()
         const mockOnDelete = jest.fn()
 
-        // Рендерим TaskList с пустым массивом задач
         const { asFragment } = render(<TaskList tasks={[]} onToggle={mockOnToggle} onDelete={mockOnDelete} />)
 
-        // Проверяем, что текст "No tasks for today!" отображается
         const messageElement = screen.getByText(/No tasks for today!/i)
         expect(messageElement).toBeInTheDocument()
 
-        // Создаём snapshot для пустого списка задач
         expect(asFragment()).toMatchSnapshot()
     })
 
@@ -22,7 +19,6 @@ describe('TaskList Component', () => {
         const mockOnToggle = jest.fn()
         const mockOnDelete = jest.fn()
 
-        // Пример массива задач
         const tasks = [
             {
                 id: '1',
@@ -44,17 +40,14 @@ describe('TaskList Component', () => {
             },
         ]
 
-        // Рендерим TaskList с непустым массивом задач
         const { asFragment } = render(<TaskList tasks={tasks} onToggle={mockOnToggle} onDelete={mockOnDelete} />)
 
-        // Проверяем, что заголовки задач отображаются
         const firstTaskTitle = screen.getByText(/Test Task 1/i)
         const secondTaskTitle = screen.getByText(/Test Task 2/i)
 
         expect(firstTaskTitle).toBeInTheDocument()
         expect(secondTaskTitle).toBeInTheDocument()
 
-        // Создаём snapshot для списка с задачами
         expect(asFragment()).toMatchSnapshot()
     })
 })

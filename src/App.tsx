@@ -17,10 +17,10 @@ interface Task {
     title: string
     description: string
     completed: boolean
-    date: string // Оригинальная дата создания
-    displayDate: string // Дата для отображения
+    date: string
+    displayDate: string
     daysSpent: number
-    isFrozen: boolean // Флаг для заморозки
+    isFrozen: boolean
 }
 
 const App: React.FC = () => {
@@ -33,7 +33,6 @@ const App: React.FC = () => {
 
     const today = format(new Date(), 'yyyy-MM-dd')
 
-    /* Подписка на изменения пользователя в БД */
     useEffect(() => {
         if (user) {
             const q = query(collection(db, 'tasks'), where('userId', '==', user.uid))
@@ -47,7 +46,6 @@ const App: React.FC = () => {
                     fetchedTasks.map(async (task) => {
                         const taskDateParsed = new Date(task.date)
 
-                        // Если задача не завершена и её дата прошла, обновляем daysSpent
                         if (!task.completed && !task.isFrozen && isBefore(taskDateParsed, new Date())) {
                             const calcDaysElapsed = differenceInCalendarDays(today, taskDateParsed)
 
@@ -85,7 +83,6 @@ const App: React.FC = () => {
             return
         }
 
-        // Валидация на прошедшую дату
         if (isBefore(selectedDate, today)) {
             setError('Cannot select past date. Please choose correct date.')
             return
@@ -96,7 +93,6 @@ const App: React.FC = () => {
             return
         }
 
-        // Если дата задачи в будущем, устанавливаем daysSpent = 0
         const daysSpent = isBefore(new Date(), selectedDate) ? 0 : differenceInCalendarDays(new Date(), selectedDate)
 
         try {
@@ -104,10 +100,10 @@ const App: React.FC = () => {
                 title,
                 description,
                 completed: false,
-                date: format(selectedDate, 'yyyy-MM-dd'), // Сохраняем оригинальную дату создания
-                displayDate: format(selectedDate, 'yyyy-MM-dd'), // Для будущих дат displayDate = date
+                date: format(selectedDate, 'yyyy-MM-dd'),
+                displayDate: format(selectedDate, 'yyyy-MM-dd'),
                 daysSpent,
-                isFrozen: false, // Изначально задача не заморожена
+                isFrozen: false,
                 userId: user.uid,
             })
             setTitle('')
@@ -124,18 +120,16 @@ const App: React.FC = () => {
             let updatedDaysSpent = differenceInCalendarDays(new Date(), new Date(date))
 
             if (!completed) {
-                // Если задача завершается, замораживаем daysSpent
                 const currentDaysSpent = differenceInCalendarDays(new Date(), new Date(date))
                 await updateDoc(taskDocRef, {
                     completed: true,
                     daysSpent: currentDaysSpent,
-                    isFrozen: true, // Замораживаем задачу
+                    isFrozen: true,
                 })
             } else {
-                // Если задача возвращается в незавершённое состояние, размораживаем daysSpent
                 await updateDoc(taskDocRef, {
                     completed: false,
-                    isFrozen: false, // Размораживаем задачу
+                    isFrozen: false,
                 })
                 updatedDaysSpent = differenceInCalendarDays(new Date(), new Date(date))
             }
@@ -147,7 +141,7 @@ const App: React.FC = () => {
                               ...task,
                               completed: !completed,
                               daysSpent: updatedDaysSpent,
-                              isFrozen: !completed, // Замораживаем или размораживаем
+                              isFrozen: !completed,
                           }
                         : task
                 )
@@ -165,7 +159,6 @@ const App: React.FC = () => {
             console.error('Error deleting task: ', err)
         }
     }
-    // Фильтруем задачи по выбранной дате с учетом displayDate
     const filteredTasks = tasks.filter((task) => {
         return selectedDate && task.displayDate === format(selectedDate, 'yyyy-MM-dd')
     })

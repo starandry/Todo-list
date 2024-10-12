@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from 'firebase/auth' // Импортируем тип User
 import { auth } from '../../../firebaseConfig'
-import styles from './Auth.module.scss' // Импортируем стили
+import styles from './Auth.module.scss'
 
 const Auth: React.FC<{
     onLogin: (user: User) => void

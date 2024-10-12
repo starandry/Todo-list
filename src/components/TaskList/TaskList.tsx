@@ -10,7 +10,7 @@ interface TaskListProps {
         completed: boolean
         date: string
         daysSpent: number
-        isFrozen: boolean // Флаг для заморозки
+        isFrozen: boolean
     }[]
     onToggle: (id: string, completed: boolean, date: string, isFrozen: boolean) => void
     onDelete: (id: string) => void
@@ -32,8 +32,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggle, onDelete }) => {
                     completed={task.completed}
                     date={task.date}
                     daysSpent={task.daysSpent}
-                    isFrozen={task.isFrozen} // Передаём флаг заморозки
-                    onToggle={() => onToggle(task.id, task.completed, task.date, task.isFrozen)} // Передаём isFrozen
+                    isFrozen={task.isFrozen}
+                    onToggle={() => onToggle(task.id, task.completed, task.date, task.isFrozen)}
                     onDelete={() => onDelete(task.id)}
                 />
             ))}
