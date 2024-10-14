@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc -b && vite build",
+        "build": "tsc -b && vite build && node fix-paths.js",
         "lint": "eslint .",
         "format": "prettier --write .",
         "fix": "eslint . --fix && prettier --write .",
@@ -50,7 +50,8 @@
         "ts-node": "^10.9.2",
         "typescript": "^5.5.3",
         "typescript-eslint": "^8.0.1",
-        "vite": "^5.4.1"
+        "vite": "^5.4.1",
+        "vite-plugin-html": "^3.2.2"
     },
     "lint-staged": {
         "*.{ts,tsx,js,jsx}": [
